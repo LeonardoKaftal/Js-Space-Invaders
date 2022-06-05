@@ -1,13 +1,3 @@
-class Enemy {
-    constructor(id,x,y) {
-        this.id = id;
-        this.x = x;
-        this.y = y;
-        this.xVelocity = 0;
-        this.yVelocity = 0; 
-    }
-}
-
 
 const enemyImageOne = new Image();
 const enemyImageTwo = new Image();
@@ -32,11 +22,31 @@ const columnRowArray = [
 ];
 
 const enemyArray = [];
+const enemyBUlletArray = [];
+
+
+
+
+class EnemyBullet {
+    constructor(enemyPositionX, enemyPositionY) {
+        this.x = enemyPositionX + 8;
+        this.y = enemyPositionY; 
+        this.yVelocity = 3;
+    }
+}
+
+
+class Enemy {
+    constructor(id,x,y) {
+        this.id = id;
+        this.x = x;
+        this.y = y;
+        this.xVelocity = 0;
+        this.yVelocity = 0; 
+    }
+}
 
 export default class EnemyController {
-    constructor(ctx) {
-        this.ctx = ctx;
-    }
 
     spawnEnemy() {
         for (let i = 0; i < 5;) {
@@ -61,19 +71,42 @@ export default class EnemyController {
     }
 
 
-    drawEnemy() {
+    drawEnemy(ctx) {
         enemyArray.forEach(element => {
             if (element.id === 1) {
-                this.ctx.drawImage(enemyImageOne,element.x,element.y,20,20);
+                ctx.drawImage(enemyImageOne,element.x,element.y,20,20);
             }
             else if (element.id === 2) {
-                this.ctx.drawImage(enemyImageTwo,element.x,element.y,20,20);
+                ctx.drawImage(enemyImageTwo,element.x,element.y,20,20);
             }
             else {
-                this.ctx.drawImage(enemyImageThree,element.x,element.y,20,20);        
+                ctx.drawImage(enemyImageThree,element.x,element.y,20,20);        
             }
         }) 
     }
 
+    computerShoot() {
+        setInterval(()=> {
+            let randomIndex = Math.floor(Math.random() * 50);
+            enemyBUlletArray.push(new EnemyBullet(enemyArray[randomIndex].x,enemyArray[randomIndex].y));
+        },500); 
+    }
+
+    movePlayerBullet(ctx) {
+        enemyBUlletArray.forEach(element => {
+            ctx.fillStyle = "red";
+            ctx.fillRect(element.x,element.y,5,15);
+            element.y += element.yVelocity;
+        })
+    }
+
+    // garbage collection
+    clearEnemyBullet() {
+        enemyBUlletArray.forEach(element => {
+            if (element.y > 600) {
+                enemyBUlletArray.splice(enemyBUlletArray.indexOf(element),1);
+            }
+        })
+    }
 }
 

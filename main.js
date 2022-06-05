@@ -1,7 +1,6 @@
 import EnemyController from "./EnemyController.js";
 import MovingAnimation from "./MovingAnimation.js";
 import PlayerController from "./PlayerController.js";
-import BulletController from "./BulletController.js";
 
 const canvas = document.querySelector(".canvas");
 const ctx = canvas.getContext('2d');
@@ -18,10 +17,9 @@ const gameController = (()=> {
     const enemy = new EnemyController(ctx);
     const player = new PlayerController();
     const movingAnimation = new MovingAnimation();
-    const shooting = new BulletController()
     
-    player.movePlayer();
     player.hasPlayerShoot(ctx)
+    enemy.computerShoot();
     draw();
 
     function draw() {
@@ -29,9 +27,13 @@ const gameController = (()=> {
         // background
         ctx.drawImage(background,0,0);
         player.drawPlayer(ctx);      
-        enemy.drawEnemy();
-        
-        movingAnimation.moveEnemy()
+        enemy.drawEnemy(ctx);
+        player.movePlayerBullet(ctx);
+        enemy.movePlayerBullet(ctx);
+        player.clearPlayerBullet();
+        enemy.clearEnemyBullet();
+        movingAnimation.moveEnemy();
+        player.move()
     }
     
 })();
