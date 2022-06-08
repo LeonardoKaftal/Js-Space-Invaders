@@ -1,41 +1,75 @@
 import EnemyController from "./EnemyController.js";
-import PlayerController from "./PlayerController.js";
+
+
 
 const enemy = new EnemyController();
-const player = new PlayerController();
-const enemyArray = enemy.spawnEnemy();
+const enemyArray = enemy.getEnemyArray();
 
 let isGoingRight = true;
+let isGoingLeft = false;
+let isGoingDown = false;
 let counter = 0;
 
 
+function down() {
+    enemyArray.forEach(element => {
+        element.yVelocity = -5;
+        element.y -= element.yVelocity;
+    })
+}
+
+function left() {
+    enemyArray.forEach(element => {
+        element.xVelocity = -1;
+        element.x += element.xVelocity;
+    })
+}
+
+function right() {
+    enemyArray.forEach(element => {
+        element.xVelocity = 1;
+        element.x += element.xVelocity;
+    })
+}
+
+
 export default class MovingAnimation {
-
-   
-
     moveEnemy() {
-        function down() {
-            enemyArray.forEach(element => {
-                element.yVelocity = -5;
-                element.y -= element.yVelocity;
-            })
+        enemyArray.forEach(element => {
+            if (element.x > 570 || element.x < 10) {
+                isGoingDown = true;
+            }
+        })
+        if (isGoingDown && counter < 5) {
+            counter++;
+            down();
         }
-    
-        function left() {
-            enemyArray.forEach(element => {
-                element.xVelocity = -1;
-                element.x += element.xVelocity;
-            })
+        if (counter >= 5) {
+            if (isGoingRight) {
+                isGoingLeft = true;
+                isGoingRight = false;
+            }
+            else {
+                isGoingLeft = false;
+                isGoingRight = true;
+            }
+            counter = 0;
+            isGoingDown = false;
         }
-    
-        function right() {
-            enemyArray.forEach(element => {
-                element.xVelocity = 1;
-                element.x += element.xVelocity;
-            })
-        }
-        
-        for (let i = 0; i < enemyArray.length; i++) {
+        if (isGoingDown === false) {
+            if (isGoingLeft) {
+                left();
+            }
+            if (isGoingRight) {
+                right();
+            }
+        } 
+    }
+}
+     
+
+
+/*for (let i = 0; i < enemyArray.length; i++) {
             let element = enemyArray[i];
             // right
             if (element.x < 300 && isGoingRight === true) {
@@ -70,10 +104,5 @@ export default class MovingAnimation {
                 if (counter >= 5) {
                     isGoingRight = true;
                 }
-                
             }
-        }
-    }
-}
-
-
+        }*/

@@ -1,7 +1,10 @@
+import PlayerController from "./PlayerController.js";
+
 
 const enemyImageOne = new Image();
 const enemyImageTwo = new Image();
 const enemyImageThree = new Image();
+
 
 enemyImageOne.src = "images/enemy.png";
 enemyImageTwo.src = "images/enemy2.png";
@@ -10,7 +13,7 @@ enemyImageThree.src="images/enemy3.png";
 
 const enemyMap = [
         [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        [2, 1, 1, 1, 1, 1, 1, 1, 1, 1],
         [2, 2, 2, 3, 3, 3, 3, 2, 2, 2],
         [2, 2, 2, 3, 3, 3, 3, 2, 2, 2],
         [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
@@ -23,8 +26,7 @@ const columnRowArray = [
 
 const enemyArray = [];
 const enemyBUlletArray = [];
-
-
+let enemyNumber = 50;
 
 
 class EnemyBullet {
@@ -83,13 +85,18 @@ export default class EnemyController {
                 ctx.drawImage(enemyImageThree,element.x,element.y,20,20);        
             }
         }) 
+        
+    }
+    
+    getEnemyArray() {
+        return enemyArray;
     }
 
     computerShoot() {
         setInterval(()=> {
-            let randomIndex = Math.floor(Math.random() * 50);
+            let randomIndex = Math.floor(Math.random() * enemyNumber);
             enemyBUlletArray.push(new EnemyBullet(enemyArray[randomIndex].x,enemyArray[randomIndex].y));
-        },500); 
+        },750); 
     }
 
     movePlayerBullet(ctx) {
@@ -100,6 +107,35 @@ export default class EnemyController {
         })
     }
 
+    enemyShooted(enemyShooted) {
+        enemyArray.splice(enemyArray.indexOf(enemyShooted), 1);
+        enemyNumber--;
+        if (enemyArray.length === 0) {
+            console.log(true)
+            return true
+        }
+        else {
+            return false;
+        }
+    }
+
+   enemyBulletCollide() {
+        const player = new PlayerController();
+        // variable that contain the updated x position of the player
+        const playerPositionCopy = player.getPlayerPosition();
+        let isGameOver = false;;
+
+        enemyBUlletArray.forEach(computerBullet => {
+            if (computerBullet.x < playerPositionCopy + 50 &&
+                computerBullet.x + 5 > playerPositionCopy &&
+                computerBullet.y < player.y + 15 &&
+                computerBullet.y + 15 > player.y) 
+            {
+                isGameOver = true;
+            }
+        })
+        return isGameOver;
+    } 
     // garbage collection
     clearEnemyBullet() {
         enemyBUlletArray.forEach(element => {

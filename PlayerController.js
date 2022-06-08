@@ -1,4 +1,13 @@
+import EnemyController from "./EnemyController.js";
 
+const enemy = new EnemyController();
+const playerBulletArray = [];
+const enemyArray = enemy.getEnemyArray();
+
+const playerImage = new Image();
+playerImage.src = "images/player.png";
+
+let playerPositionCopy;
 class PlayerBullet {
     constructor(playerPositionX, playerPositionY) {
         this.x = playerPositionX + 23;
@@ -7,7 +16,6 @@ class PlayerBullet {
     }
 }
 
-const playerBulletArray = [];
 export default class Player {
 
 rightPressed = false;
@@ -15,14 +23,12 @@ leftPressed = false;
 
     constructor() {
         this.x = 300;
-        this.y = 440;
+        this.y = 450;
         document.addEventListener("keydown",this.keydown);
-        document.addEventListener("keyup",this.keyup)
+        document.addEventListener("keyup",this.keyup);
     }
 
     drawPlayer(ctx) {
-        const playerImage = new Image();
-        playerImage.src = "images/player.png";  
         ctx.drawImage(playerImage,this.x,this.y);
     }
 
@@ -37,6 +43,11 @@ leftPressed = false;
                 this.x -= 5;
             }
         }
+        playerPositionCopy = this.x;
+    }
+
+    getPlayerPosition() {
+        return playerPositionCopy;
     }
     
     keydown = e => {
@@ -76,7 +87,7 @@ leftPressed = false;
         
         setInterval(()=> {
             canPlayerShoot = true;
-        },1000);
+        },500);
     }
 
     movePlayerBullet(ctx) {
@@ -87,12 +98,47 @@ leftPressed = false;
         })
     }
 
-    // garbage collection
-    clearPlayerBullet() {
-        playerBulletArray.forEach(element => {
-            if (element.y > 600) {
-                playerBulletArray.splice(playerBulletArray.indexOf(element));
+    
+  
+    // 2d collision algorithm 
+    playerBulletCollide() {
+        let isGameOver = false;
+
+        playerBulletArray.forEach(playerBullet => {
+            enemyArray.forEach(enemyToCollide => {
+                if (playerBullet.x < enemyToCollide.x + 20 &&
+                    playerBullet.x + 5 > enemyToCollide.x && 
+                    playerBullet.y < enemyToCollide.y + 20 && 
+                    playerBullet.y + 15 > enemyToCollide.y) 
+                {
+                    isGameOver = enemy.enemyShooted(enemyToCollide);  
+                    playerBulletArray.splice(playerBulletArray.indexOf(playerBullet),1);
+                }
+            })
+        })
+        return isGameOver;
+    }
+
+    playerCollideWithEnemies() {
+        let isGameOver = false;
+        enemyArray.forEach(enemy => {
+            if (enemy.x < this.x + 50 &&
+                enemy.x + 20 < this.x &&
+                enemy.y < this.y + 50 &&
+                enemy.y + 20 > this.y) 
+            {
+                isGameOver = true;
             }
         })
-    }    
+        return isGameOver;
+    }
+
+     // garbage collection
+     clearPlayerBullet() {
+        playerBulletArray.forEach(element => {
+            if (element.y < 0) {
+                playerBulletArray.splice(playerBulletArray.indexOf(element),1);
+            }
+        })
+    }
 }
